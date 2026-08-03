@@ -1,30 +1,33 @@
-# Native Codex role contracts
+# Sol Advisor role contracts
 
-Use these contracts with Sol Advisor's namespaced, role-pinned native custom agents.
-They do not launch a nested Codex CLI or change global default-subagent routing.
-Adapt every placeholder without removing a required field.
+Use these contracts with Sol Advisor's native Codex roles and optional external Fable
+lanes. Adapt every placeholder without removing a required field.
 
-## Required preflight
+The primary Sol session must be `gpt-5.6-sol` at High or above: `high`, `xhigh`, `max`,
+or `ultra`. This flexible gate applies only to the primary architect. Native companions
+remain exact pins: Luna / Max, Terra / Max, and reviewer Sol / High.
 
-Before every spawn, complete steps 1-2 of SKILL.md's preflight. After spawning,
-complete steps 3-4 before accepting the result:
+## Required native-agent preflight
 
-1. Require the non-mutating companion check to prove both installed files exactly
-   match current templates and the retired companion file is absent.
-2. Require native exposure of exactly `sol_advisor_terra_implementer` and
-   `sol_advisor_sol_reviewer`.
+Before every native spawn, complete steps 1–2 of SKILL.md's preflight. After spawning,
+complete steps 3–4 before accepting the lane's result:
+
+1. Require the non-mutating companion check to prove Luna, Terra, and Sol exactly match
+   current templates.
+2. Require native exposure of exactly `sol_advisor_luna_implementer`,
+   `sol_advisor_terra_implementer`, and `sol_advisor_sol_reviewer`.
 3. Observe the selected role, model, and effort through public spawn/details metadata
-   first, using the local runtime inspector only for omitted fields. Accept only
-   Terra / High for implementation and Sol / High for review.
+   first, using the local runtime inspector only for omitted fields. Accept only Luna /
+   max, Terra / max, or reviewer Sol / high according to the chosen role.
 4. For the reviewer, capture actual sandbox policy and permission profile types.
 
 A missing, stale, unsafe, conflicting, unavailable, inconsistent, or unobservable
-role/model/effort stops the lane. Never silently fall back. Model and effort are pinned
-by custom-agent TOML, so omit per-spawn overrides.
+role/model/effort stops that native lane. Never silently fall back. Model and effort are
+pinned by custom-agent TOML, so omit per-spawn overrides.
 
-## Shared implementation contract
+## Shared five-part implementation contract
 
-Every Terra prompt must contain all five sections:
+Every Luna, Terra, or Fable implementation prompt must contain all five sections:
 
 ~~~text
 OBJECTIVE
@@ -47,7 +50,7 @@ CONSTRAINTS
 VERIFICATION
 - Run: <exact command>
   Success: <concrete expected result>
-- Inspect: <exact file, diff, or generated artifact>
+- Inspect: <exact file, diff, screenshot, or generated artifact>
   Success: <concrete expected evidence>
 
 RETURN
@@ -62,12 +65,36 @@ JUDGMENT CALLS: <decisions the specification left open, or none>
 GAPS: <unfinished work, ambiguity, or none>
 ~~~
 
-The primary session must inspect the diff and rerun verification itself.
+The primary session must inspect the actual diff and rerun verification itself.
 
-## Terra / High - sole implementation lane
+## Luna / Max — routine implementer
 
-Use this lane for every delegated implementation, from routine edits through complex,
-security-sensitive, context-heavy, and broad work.
+Use for bounded work whose result is largely determined by the specification.
+
+Spawn exactly:
+
+~~~text
+agent_type: sol_advisor_luna_implementer
+fork_turns: none
+~~~
+
+The installed role pins GPT-5.6 Luna at max reasoning. Do not attach per-spawn model or
+effort fields. Require public-details-first runtime evidence before accepting its work.
+
+Prompt:
+
+~~~text
+ROLE
+Act as Sol Advisor's routine implementation worker. Execute the specification exactly;
+surface ambiguity instead of redesigning the architecture.
+
+<paste and complete the Shared five-part implementation contract>
+~~~
+
+## Terra / Max — complex implementer
+
+Use when correctness depends on context, judgment, difficult debugging, non-trivial
+algorithms, security-sensitive paths, broad refactors, or larger blast radius.
 
 Spawn exactly:
 
@@ -76,24 +103,104 @@ agent_type: sol_advisor_terra_implementer
 fork_turns: none
 ~~~
 
-The installed role pins GPT-5.6 Terra at high reasoning. Do not attach per-spawn model
-or reasoning fields. Require public-details-first runtime observation of the exact
-role and pin before accepting its report.
+The installed role pins GPT-5.6 Terra at max reasoning. Do not attach per-spawn model
+or effort fields. Require public-details-first runtime evidence before accepting its
+work.
 
 Prompt:
 
 ~~~text
 ROLE
-Act as Sol Advisor's sole implementation worker. Resolve the supplied specification
-within the settled architecture, preserve every stated interface and constraint, and
-surface ambiguity instead of redesigning the architecture.
+Act as Sol Advisor's complex implementation worker. Resolve difficult implementation
+details within the settled architecture, document material judgment calls, and
+preserve every stated interface and constraint.
 
-<paste and complete the Shared implementation contract>
+<paste and complete the Shared five-part implementation contract>
 ~~~
 
-## Fresh Sol - requested-read-only final reviewer
+## Fable / Max — optional specialist implementer
 
-After parent verification, spawn a new native thread exactly:
+Fable is an external Claude Code lane, not a native Codex custom agent. Use it instead
+of Luna or Terra for an owned file set only when the routing rules in SKILL.md select
+Fable for visual fidelity, long-horizon work, large migration scope, unfamiliar tools,
+cross-family judgment, or an explicit user request.
+
+The runner uses Claude Code safe mode. Copy every relevant repository instruction,
+convention, and excluded path into the packet rather than relying on Claude's global or
+project configuration. Write this packet to a regular prompt file and pass it to
+`../../scripts/run-fable-agent.sh --mode implement`:
+
+~~~text
+ROLE
+Act as Sol Advisor's optional Claude Fable implementation specialist. You are the sole
+writer for the exact owned files below. Work within the settled architecture. Do not
+delegate, broaden scope, or modify files outside ownership.
+
+<paste and complete the Shared five-part implementation contract>
+
+FABLE-SPECIFIC EVIDENCE
+- For visual work, inspect: <rendered page, screenshot, or supplied visual reference>
+  Success: <observable fidelity and responsive behavior>
+- Report any task that could not be completed because a tool, permission, or model
+  safeguard blocked the requested work.
+~~~
+
+The runner pins the `fable` alias at max effort and returns Claude Code JSON. Accept
+the lane only when the output proves Fable 5 usage, the diff stays within ownership,
+and the primary session reruns verification. A fallback model is not Fable evidence.
+
+## Optional Fable adversarial reviewer
+
+This is advisory and cross-model-family. Use it selectively under SKILL.md's criteria;
+never make it a universal completion gate. Do not use it to review Fable's own
+implementation unless the user explicitly wants same-family review for another reason.
+
+Capture the exact repository and artifact state before invoking it. The runner uses
+Claude Code safe mode, so include all relevant repository rules in the packet. Write
+this packet to a regular prompt file and pass it to
+`../../scripts/run-fable-agent.sh --mode review`:
+
+~~~text
+ROLE
+Act as an external Claude Fable adversarial reviewer. Remain strictly read-only. Do not
+edit files, execute shell commands, or implement fixes.
+
+STATED GOAL
+<The user's requested outcome.>
+
+IMPLEMENTATION LANE
+<Luna / Max, Terra / Max, or other exact producer evidence.>
+
+ACCUMULATED CHANGE SET
+<Complete diff or explicit base/head revisions, plus exact allowed files.>
+
+INTERFACES AND CONSTRAINTS
+- <Compatibility, repository rules, safety boundaries, design goal, and excluded scope.>
+
+VERIFICATION EVIDENCE
+- <command> -> <actual primary-session output>
+- <artifact, browser journey, or screenshot> -> <actual evidence>
+
+ADVERSARIAL REVIEW
+Challenge correctness, completeness, architecture assumptions, regressions, scope,
+test adequacy, and visual fidelity where relevant. Prefer concrete counterexamples over
+style opinions. Separate required defects from optional improvements.
+
+FABLE ADVERSARIAL REVIEW
+VERDICT: pass | concerns | block
+REASON: <decisive evidence-based reason>
+FINDINGS: <precise file references and required fixes, or none>
+RESIDUAL RISK: <largest remaining risk, or none>
+~~~
+
+After the call, verify exact before-and-after repository and artifact state. Judge the
+findings in the primary Sol session. Required fixes go back to an implementation lane,
+followed by parent verification. This reviewer never replaces the mandatory fresh Sol
+review.
+
+## Fresh Sol / High — requested-read-only final reviewer
+
+After implementation and primary verification, spawn a new native thread exactly:
 
 ~~~text
 agent_type: sol_advisor_sol_reviewer
@@ -101,15 +208,15 @@ fork_turns: none
 ~~~
 
 The installed role pins GPT-5.6 Sol at high reasoning and requests a read-only sandbox.
-Do not attach per-spawn model or reasoning fields. Observe the actual role, pin,
-sandbox policy, and permission profile before accepting its verdict.
+Do not attach per-spawn model or effort fields. Observe the actual role, pin, sandbox
+policy, and permission profile before accepting its verdict.
 
 Prompt:
 
 ~~~text
 ROLE
-Act as the fresh final reviewer. Remain strictly read-only: do not edit files, implement
-fixes, or broaden scope.
+Act as the fresh final reviewer. Remain strictly read-only: do not edit files,
+implement fixes, or broaden scope.
 
 STATED GOAL
 <The user's requested outcome.>
@@ -123,6 +230,9 @@ INTERFACES AND CONSTRAINTS
 VERIFICATION EVIDENCE
 - <command> -> <actual primary-session output evidence>
 - <artifact or diff inspection> -> <actual evidence>
+
+OPTIONAL ADVERSARIAL EVIDENCE
+<Fable verdict and findings when used, or explicitly "not used; optional lane not warranted".>
 
 REVIEW
 Inspect the actual files and accumulated change set. Judge correctness, completeness,
@@ -152,5 +262,5 @@ Use observed isolation, not requested isolation:
 For pre-implementation review, spawn the same fresh Sol role with `fork_turns: none`.
 Give it the proposed decision, goal, constraints, relevant paths, alternatives, and the
 one question that changes the plan. Require `proceed`, `change`, or `stop`, plus the
-decisive reason and largest risk. Apply the same preflight, runtime-observation,
+decisive reason and largest risk. Apply the same native preflight, runtime-observation,
 sandbox-reporting, and no-fallback rules.

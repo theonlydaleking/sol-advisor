@@ -1,11 +1,14 @@
 # Sol Advisor
 
-**Sol runs the show. Terra / High handles implementation, and a fresh Sol review
-with a requested read-only profile stands between the diff and done.**
+**Sol runs the show at High or above. Luna / Max handles routine implementation,
+Terra / Max takes the harder builds, optional Fable / Max provides a cross-vendor
+specialist lane, and a fresh Sol / High review stands between the diff and done.**
 
 Sol Advisor is a Codex-native architect workflow for capability-routed software
 delivery. The primary session stays focused on requirements, architecture, specs, and
 verification while native Codex custom-agent threads handle implementation and review.
+Claude Fable is available as an optional external implementation or adversarial-review
+lane; it is never required for completion.
 
 ## Go deeper
 
@@ -13,13 +16,17 @@ I write [**Attention Heads**](https://attentionheads.substack.com/?utm_source=gi
 
 | Lane | Native agent type | Pinned profile | Use it for |
 |---|---|---|---|
-| Orchestrator | Primary session | GPT-5.6 Sol / High | Requirements, architecture, decomposition, routing, and acceptance |
-| Implementation | sol_advisor_terra_implementer | GPT-5.6 Terra / High | Bounded work specified by the Sol orchestrator |
+| Orchestrator | Primary session | GPT-5.6 Sol / High or above | Requirements, architecture, decomposition, routing, and acceptance |
+| Routine implementation | sol_advisor_luna_implementer | GPT-5.6 Luna / Max | Mechanical, repeatable, fully specified work |
+| Harder implementation | sol_advisor_terra_implementer | GPT-5.6 Terra / Max | Context-heavy, higher-risk, or wider-blast-radius work |
+| Optional specialist | External Claude Code runner | Claude Fable 5 / Max | Visual, long-horizon, migration, or cross-family implementation |
+| Optional adversarial review | External Claude Code runner | Claude Fable 5 / Max / restricted read-only tools | Selective cross-family challenge; never a completion gate |
 | Final review | sol_advisor_sol_reviewer | GPT-5.6 Sol / High / requests read-only | Fresh review of the actual diff and verification evidence |
 
 The final review is context-independent, not model-family-independent: Sol reviews
 Sol's orchestration with a fresh context. That catches conversational assumptions, but
-it is not cross-vendor review.
+it is not cross-vendor review. The optional Fable adversarial lane supplies that
+cross-family perspective when the task warrants it.
 
 ## Install from GitHub
 
@@ -27,13 +34,14 @@ Requirements:
 
 - A current Codex CLI or ChatGPT desktop app with plugins, native subagents, and
   custom agents enabled.
-- Access to GPT-5.6 Sol / High and GPT-5.6 Terra / High.
+- Access to GPT-5.6 Sol at High or above, GPT-5.6 Luna / Max, and GPT-5.6 Terra / Max.
+- Optional: Claude Code with access to the `fable` alias for Fable specialist lanes.
 - jq, which the companion-install lookup uses to locate the installed plugin package.
 
 Add the GitHub repository as a Codex marketplace, then install the plugin:
 
 ~~~sh
-codex plugin marketplace add DannyMac180/sol-advisor --ref main
+codex plugin marketplace add theonlydaleking/sol-advisor --ref main
 codex plugin add sol-advisor@sol-advisor
 ~~~
 
@@ -59,8 +67,9 @@ missing template and then verifies every installed copy byte-for-byte.
 Start a **new Codex task** after the check passes. Native agent types are discovered at
 task creation, so an existing task may not see the installed roles.
 
-Then select GPT-5.6 Sol with High reasoning for the primary session and ask for
-implementation work normally, or invoke the orchestration skill explicitly:
+Then select GPT-5.6 Sol with High, Extra High, Max, or Ultra reasoning for the primary
+session and ask for implementation work normally, or invoke the orchestration skill
+explicitly. The primary gate is **at least High**, not exactly High:
 
 ~~~text
 Use $sol-advisor:orchestration to build this feature, verify it, and obtain the final Sol review before reporting done.
@@ -76,8 +85,8 @@ test -d "$plugin_dir"
 sh "$plugin_dir/scripts/install-agents.sh" --check
 ~~~
 
-To update the marketplace plugin and migrate the exact recognized v0.2.0 companion
-files:
+To update the marketplace plugin and migrate the exact recognized v0.3.0 Terra / High
+companion:
 
 ~~~sh
 codex plugin marketplace upgrade sol-advisor
@@ -88,14 +97,12 @@ sh "$plugin_dir/scripts/install-agents.sh"
 sh "$plugin_dir/scripts/install-agents.sh" --check
 ~~~
 
-Version 0.3.0 recognizes only byte-exact v0.2.0 legacy
-`sol-advisor-luna-implementer.toml` and `sol-advisor-terra-implementer.toml` files.
-Normal installer mode replaces the exact legacy Terra file with the current Terra /
-High template, removes the exact legacy Luna file, and refuses modified, nonregular,
-or symlinked destinations without partial agent-file mutation. `--check` is
-non-mutating and fails until both current role files match exactly and Luna is absent.
-This routing update was motivated by
-[Eric Provencher's X post](https://x.com/pvncher/status/2083300990350954981).
+Version 0.4.0 restores the v0.2.0 routing contract. Normal installer mode recognizes
+only the byte-exact v0.3.0 Terra / High profile, migrates it back to Terra / Max,
+restores a missing Luna / Max profile, and refuses modified, nonregular, or symlinked
+destinations without partial agent-file mutation. Existing byte-exact v0.2.0 Luna /
+Max, Terra / Max, and Sol / High profiles are already current. `--check` is
+non-mutating and fails until all three current roles match exactly.
 
 Do not use a substitute agent as a shortcut. Start a fresh task after every successful
 install or update.
@@ -130,14 +137,16 @@ exist, they must agree.
 ## How routing works
 
 The Sol orchestrator writes a five-part spec for every implementation: objective, file
-ownership, interfaces, constraints, and verification. Terra / High is the sole
-implementation producer; Sol keeps architecture, routing, parent verification, and
-acceptance in the primary session.
+ownership, interfaces, constraints, and verification. Luna / Max is the routine native
+producer. Terra / Max handles context-heavy, higher-risk, or wider-blast-radius work.
+Fable / Max is an optional alternate writer for visual, long-horizon, migration, or
+cross-family tasks. It replaces a native writer for an owned file set; it is not an
+extra compulsory implementation hop.
 
 Before delegation and acceptance, the skill requires all of the following:
 
 1. The installed role files pass the byte-for-byte companion check.
-2. The native spawn tool exposes both exact names in the table above.
+2. The native spawn tool exposes all three native names in the table above.
 3. Public native spawn/details metadata identifies the selected role and, when exposed,
    its expected model and effort. If model or effort is omitted, the exact-rollout local
    inspector above must provide them instead.
@@ -160,8 +169,37 @@ review lane and do not claim enforced read-only isolation.
 
 The orchestrator inspects every diff and reruns verification. A fresh Sol reviewer then
 returns ship, fix-first, or rethink. The session cannot report completion until the
-reviewer returns ship. These remain native Codex subagent threads; Sol Advisor does not
-launch a nested Codex CLI process or globally reroute unrelated subagents.
+reviewer returns ship. Luna, Terra, and Sol remain native Codex threads. Optional
+Fable lanes use a separate Claude Code process and never globally reroute unrelated
+subagents.
+
+## Optional Fable lanes
+
+The shipped runner invokes Claude Code's `fable` alias at max effort and returns JSON
+containing result, usage, and cost metadata. It has two modes:
+
+- `implement`: edit-capable specialist lane for high-fidelity frontend/visual work,
+  large migrations, unfamiliar stacks, long-horizon tasks, or explicit user requests.
+- `review`: adversarial lane with auto-denied permission prompts and only Read, Grep,
+  and Glob tools. Use it selectively for consequential or cross-family review; it
+  never replaces final Sol.
+
+The orchestrator writes the relevant packet from `references/role-contracts.md` to a
+regular prompt file and invokes:
+
+~~~sh
+plugin_dir="$(codex plugin list --json | jq -r '.installed[] | select(.pluginId == "sol-advisor@sol-advisor") | .source.path')"
+sh "$plugin_dir/scripts/run-fable-agent.sh" \
+  --mode implement \
+  --workdir /absolute/path/to/repository \
+  --prompt-file /absolute/path/to/five-part-spec.txt
+~~~
+
+Both modes run Claude Code in safe mode to avoid loading unrelated plugins, hooks,
+memory, and global skills. The prompt packet must therefore include every relevant
+repository rule. Use `--mode review` with the adversarial-review packet for the optional
+reviewer. The runner refuses output that does not prove Fable 5 usage. Never run Fable
+and a native implementer concurrently on the same files.
 
 ## Local development
 
@@ -214,9 +252,10 @@ uv run --no-project --with pyyaml python "$codex_skills/plugin-creator/scripts/v
 jq empty .agents/plugins/marketplace.json plugins/sol-advisor/.codex-plugin/plugin.json
 ~~~
 
-The verifier validates JSON and TOML, the two exact role pins, clean/current/missing
-and idempotent installer behavior, exact-v0.2.0 migration, refusal/non-mutation gates,
-runtime-inspector safe fixtures, contract references, and shell syntax. The uv commands
+The verifier validates JSON and TOML, all three exact native role pins, clean/current/
+missing and idempotent installer behavior, exact-v0.3.0 Terra migration, Fable runner
+argument/model-proof fixtures, refusal/non-mutation gates, runtime-inspector safe
+fixtures, contract references, and shell syntax. The uv commands
 supply the validators' PyYAML dependency in a disposable environment. They do not
 install the marketplace or mutate Codex configuration.
 

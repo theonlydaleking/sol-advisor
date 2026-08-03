@@ -1,21 +1,21 @@
 {
   "name": "sol-advisor",
-  "version": "0.3.0",
-  "description": "Codex-native architect workflow with one role-pinned Terra / High implementation agent and a fresh requested-read-only Sol review.",
+  "version": "0.4.0",
+  "description": "Sol-led delivery with native Luna and Terra implementers, optional Claude Fable lanes, and fresh Sol review.",
   "author": {"name": "Daniel McAteer", "url": "https://github.com/DannyMac180"},
-  "homepage": "https://github.com/DannyMac180/sol-advisor#readme",
-  "repository": "https://github.com/DannyMac180/sol-advisor",
+  "homepage": "https://github.com/theonlydaleking/sol-advisor#readme",
+  "repository": "https://github.com/theonlydaleking/sol-advisor",
   "license": "MIT",
   "keywords": ["codex", "orchestration", "multi-agent", "gpt-5.6"],
   "skills": "./skills/",
   "interface": {
     "displayName": "Sol Advisor",
-    "shortDescription": "Architect with Sol, implement with role-pinned Terra / High, and review with Sol.",
-    "longDescription": "Sol Advisor gives Codex a delivery workflow: GPT-5.6 Sol orchestrates, one separately installed role-pinned GPT-5.6 Terra / High agent handles all implementation, and a fresh requested-read-only Sol reviewer must approve the final diff.",
+    "shortDescription": "Architect with Sol, route implementation, and finish with fresh Sol review.",
+    "longDescription": "Sol Advisor gives Codex a delivery workflow: GPT-5.6 Sol at High or above orchestrates, native Luna / Max and Terra / Max agents handle routed implementation, optional Claude Fable / Max lanes provide specialist implementation or adversarial review, and a fresh requested-read-only Sol / High reviewer must approve the final diff.",
     "developerName": "Daniel McAteer",
     "category": "Productivity",
     "capabilities": ["Interactive", "Write"],
-    "websiteURL": "https://github.com/DannyMac180/sol-advisor",
-    "defaultPrompt": ["Use Sol Advisor to build this feature and verify it before completion.", "Route all implementation through Sol Advisor's Terra / High agent.", "Review this deliverable with a fresh Sol advisor before reporting done."]
+    "websiteURL": "https://github.com/theonlydaleking/sol-advisor",
+    "defaultPrompt": ["Use Sol Advisor to build this feature and verify it before completion.", "Use Sol Advisor to choose Luna, Terra, or optional Fable for this implementation.", "Review this deliverable with a fresh Sol advisor before reporting done."]
   }
 }
