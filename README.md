@@ -97,7 +97,7 @@ sh "$plugin_dir/scripts/install-agents.sh"
 sh "$plugin_dir/scripts/install-agents.sh" --check
 ~~~
 
-Version 0.4.0 restores the v0.2.0 routing contract. Normal installer mode recognizes
+Version 0.4.1 restores the v0.2.0 routing contract. Normal installer mode recognizes
 only the byte-exact v0.3.0 Terra / High profile, migrates it back to Terra / Max,
 restores a missing Luna / Max profile, and refuses modified, nonregular, or symlinked
 destinations without partial agent-file mutation. Existing byte-exact v0.2.0 Luna /

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Repository-local verification for Sol Advisor native roles and optional Fable lanes.
+# Source-checkout and installed-package verification for Sol Advisor.
 
 set -eu
 
@@ -16,7 +16,6 @@ templates=$plugin_dir/agents
 manifest=$plugin_dir/.codex-plugin/plugin.json
 skill=$plugin_dir/skills/orchestration/SKILL.md
 contracts=$plugin_dir/skills/orchestration/references/role-contracts.md
-readme=$repo_dir/README.md
 
 tmp_base=${TMPDIR:-/tmp}
 case "$tmp_base" in /*) ;; *) tmp_base=/tmp ;; esac
@@ -81,12 +80,12 @@ LEGACY_TERRA
     fail "v0.3.0 Terra fixture digest drifted"
 }
 
-for required in "$installer" "$runtime_inspector" "$fable_runner" "$manifest" "$skill" "$contracts" "$readme"; do
+for required in "$installer" "$runtime_inspector" "$fable_runner" "$manifest" "$skill" "$contracts"; do
   test -f "$required" || fail "required file missing: $required"
 done
 
 jq empty "$manifest"
-[ "$(jq -r '.version' "$manifest")" = 0.4.0 ] || fail "manifest version is not 0.4.0"
+[ "$(jq -r '.version' "$manifest")" = 0.4.1 ] || fail "manifest version is not 0.4.1"
 pass "manifest JSON and version"
 
 python3 - "$templates" <<'PY'
@@ -479,4 +478,4 @@ sh -n "$fable_runner"
 sh -n "$script_dir/verify.sh"
 pass "shell syntax"
 
-printf '%s\n' "VERIFY PASSED: Sol Advisor v0.4.0 checks completed in $tmp_dir"
+printf '%s\n' "VERIFY PASSED: Sol Advisor v0.4.1 checks completed in $tmp_dir"

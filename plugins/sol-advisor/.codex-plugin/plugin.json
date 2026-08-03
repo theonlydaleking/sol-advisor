@@ -1,6 +1,6 @@
 {
   "name": "sol-advisor",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Sol-led delivery with native Luna and Terra implementers, optional Claude Fable lanes, and fresh Sol review.",
   "author": {"name": "Daniel McAteer", "url": "https://github.com/DannyMac180"},
   "homepage": "https://github.com/theonlydaleking/sol-advisor#readme",
